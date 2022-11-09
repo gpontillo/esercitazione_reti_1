@@ -1,6 +1,6 @@
 /*
  ============================================================================
- Name        : esercitazione_reti_1.c
+ Name        : server.c
  Author      : 
  Version     :
  Copyright   : Your copyright notice
