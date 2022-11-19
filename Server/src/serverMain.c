@@ -115,7 +115,7 @@ int main() {
 		}
 
 
-	printf("Connection established\n\n");
+	printf("\n\nConnection established\n\n");
 	//VISUALIZZAZIONE IP DEL CLIENT
 	printf("Handling client with IP: %s\n\n", inet_ntoa(clientAddress.sin_addr));
 
@@ -123,9 +123,12 @@ int main() {
 
 	char stringaInvio[20] = "Connessione avvenuta";
 
+
 	//int invio;
 
 	send(serverSocket, stringaInvio, BUFFERSIZE, 0);
+
+
 
 	/*char stringa[BUFFERSIZE] = " ";
 

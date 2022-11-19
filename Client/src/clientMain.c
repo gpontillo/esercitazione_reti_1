@@ -76,6 +76,10 @@ int main(void) {
 		return -1;
 	}
 
+
+	// RICEZIONE STRINGA AVVENUTA CONNESSIONE
+
+
 	// GESTIONE DELLA CONNESSIONE COL SERVER
 	char buf[BUFFER_SIZE]; // buffer for data from the server
 	do {
@@ -108,6 +112,10 @@ int main(void) {
 		}
 
 		// RICEVO STRINGA DAL SERVER
+
+
+
+
 		int bytesRcvd;
 		int totalBytesRcvd = 0;
 		printf("Received: "); // Setup to print the echoed string
