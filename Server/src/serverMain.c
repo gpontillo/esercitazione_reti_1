@@ -21,8 +21,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define PROTOPORT 27015 // default protocol port number
-#define QLEN 6 // size of request queue
+#define PORT 27015 // default protocol port number
+#define CLIENT_NUMBERS 6 // size of request queue
 #define BUFFERSIZE 1024
 
 void errorHandler(char *errorMessage) {
@@ -43,16 +43,8 @@ void closeConnection(int mySocket) {
 
 int main(int argc, char *argv[]) {
 
-	int port;
-	if (argc > 1) {
-		port = atoi(argv[1]); // if argument specified convert argument to binary
-	}
-	else
-		port = PROTOPORT; // use default port number
-	if (port < 0) {
-		printf("bad port number %s \n", argv[1]);
-		return 0;
-	}
+
+
 	#if defined WIN32 // initialize Winsock
 	WSADATA wsaData;
 	int iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
@@ -63,9 +55,11 @@ int main(int argc, char *argv[]) {
 	#endif
 	
 	// CREAZIONE DELLA SOCKET
-	int MySocket;
-	MySocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (MySocket < 0) {
+	int serverSocket;
+
+	serverSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	if (serverSocket < 0) {
 		errorHandler("socket creation failed.\n");
 		clearWinSock();
 		return -1;
@@ -73,52 +67,73 @@ int main(int argc, char *argv[]) {
 
 
 	// ASSEGNAZIONE DI UN INDIRIZZO ALLA SOCKET
-	struct sockaddr_in sad;
-	memset(&sad, 0, sizeof(sad)); // ensures that extra bytes contain 0
-	sad.sin_family = AF_INET;
-	sad.sin_addr.s_addr = inet_addr("127.0.0.1");
-	sad.sin_port = htons(port);
+	struct sockaddr_in socketAddress;
+
+	memset(&socketAddress, 0, sizeof(socketAddress)); // ensures that extra bytes contain 0
+
+	socketAddress.sin_family = AF_INET;
+	socketAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
+	socketAddress.sin_port = htons(PORT);
 	/*
 	 * converts values between the host and
 	 * network byte order. Specifically, htons() converts 16-bit quantities
 	 * from host byte order to network byte order.
 	 */
-	if (bind(MySocket, (struct sockaddr*) &sad, sizeof(sad)) < 0) {
+	if (bind(serverSocket, (struct sockaddr*) &socketAddress, sizeof(socketAddress)) < 0) {
 		errorHandler("bind() failed.\n");
-		closesocket(MySocket);
+		closesocket(socketAddress);
 		clearWinSock();
 		return -1;
 	}
 
 	// SETTAGGIO DELLA SOCKET ALL'ASCOLTO
-	if (listen (MySocket, QLEN) < 0) {
+	if (listen (socketAddress, CLIENT_NUMBERS) < 0) {
 		errorHandler("listen() failed.\n");
-		closesocket(MySocket);
+		closesocket(socketAddress);
 		clearWinSock();
 		return -1;
 	}
 
 	// ACCETTARE UNA NUOVA CONNESSIONE
-	struct sockaddr_in cad; // structure for the client address
+	struct sockaddr_in clientAddress; // structure for the client address
 	int clientSocket; // socket descriptor for the client
 	int clientLen; // the size of the client address
+
 	printf("Waiting for a client to connect...");
-	while (1) { /* oppure for (;;) */
-		clientLen = sizeof(cad); // set the size of the client address
-		if ((clientSocket = accept(MySocket, (struct sockaddr *)&cad,&clientLen)) < 0) {
+
+	while (true) {
+
+		clientLen = sizeof(clientAddress); // set the size of the client address
+
+		clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddress,&clientLen);
+
+		if (clientSocket < 0) {
 			errorHandler("accept() failed.\n");
-			closeConnection(MySocket);
+			closeConnection(serverSocket);
 			return 0;
 		}
-		printf("Handling client %s\n", inet_ntoa(cad.sin_addr));
+
+
+	printf("Connection established\n\n");
+	//VISUALIZZAZIONE IP DEL CLIENT
+	printf("Handling client with IP: %s\n\n", inet_ntoa(clientAddress.sin_addr));
 
 	//RICEZIONE DELLA STRINGA
 
-	char stringa[BUFFERSIZE] = " ";
+	char stringaInvio[20] = "Connessione avvenuta";
+
+	int invio;
+
+	invio = send(serverSocket, stringaInvio, BUFFERSIZE, 0);
+
+	/*char stringa[BUFFERSIZE] = " ";
 
 	int ricevi;
 
-	ricevi = recv(MySocket, stringa, BUFFERSIZE, 0);
+	ricevi = recv(serverSocket, stringa, BUFFERSIZE, 0);
+
+	printf("%s", stringa);*/
+
 
 
 	}

@@ -35,18 +35,10 @@ void ClearWinSock() {
 
 int main(void) {
 	
-	char ipAddress[SIZE];
-
-	printf("Inserisci l'IP del Server");
-
-	gets(ipAddress);
-
-	fflush(stdin);
-
-
 
 
 	#if defined WIN32
+
 	WSADATA wsaData;
 	int iResult = WSAStartup(MAKEWORD(2 ,2), &wsaData);
 	if (iResult != 0) {
@@ -80,6 +72,8 @@ int main(void) {
 		ClearWinSock();
 		return -1;
 	}
+
+
 	char buf[BUFFERSIZE]; // buffer for data from the server
 	do {
 		char* aString = ""; // Stringa A da inviare
