@@ -34,8 +34,6 @@ void ClearWinSock() {
 }
 
 int main(void) {
-	
-
 
 	#if defined WIN32
 
@@ -58,11 +56,15 @@ int main(void) {
 	}
 
 	// COSTRUZIONE DELL’INDIRIZZO DEL SERVER
+	int port = PROTOPORT;
+	printf("Insert the port number of the server: ");
+	scanf("%d", &port);
+
 	struct sockaddr_in sad;
 	memset(&sad, 0, sizeof(sad));
 	sad.sin_family = AF_INET;
 	sad.sin_addr.s_addr = inet_addr("127.0.0.1"); // IP del server
-	sad.sin_port = htons(5193); // Server port
+	sad.sin_port = htons(port); // Server port
 
 	// CONNESSIONE AL SERVER
 	if (connect(Csocket, (struct sockaddr *)&sad, sizeof(sad)) < 0)
