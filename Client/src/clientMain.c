@@ -76,10 +76,6 @@ int main(void) {
 		return -1;
 	}
 
-
-	// RICEZIONE STRINGA AVVENUTA CONNESSIONE
-
-
 	// GESTIONE DELLA CONNESSIONE COL SERVER
 
 	// Ricevo stringa "connnessione avvenuta"
