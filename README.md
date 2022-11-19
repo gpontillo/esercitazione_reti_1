@@ -1,5 +1,8 @@
 # Esercizio Reti: "Stringe A+B"
-Traccia di riferimento:
+## Traccia
+
+Di seguito è riportata la traccia di riferimento che possiamo ritrovare anche al questo [link](https://elearning.di.uniba.it/pluginfile.php/97138/mod_resource/content/1/Assegnazione%20TCP%20-%20Reti2223.pdf).
+
 > Traccia di Laboratorio – Reti di calcolatori
 > 
 > Progettare e implementare (scrivendo codice portabile) un’applicazione TCP client/server conforme al seguente protocollo:
