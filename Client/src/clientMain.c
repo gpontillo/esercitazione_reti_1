@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #define SIZE 10
-#define BUFFER_SIZE 512
+#define BUFFER_SIZE 1024
 #define DEFAULT_PORT 5555 // Numero di porta di default
 
 void ErrorHandler(char *errorMessage) {
@@ -47,11 +47,11 @@ int main(void) {
 	#endif
 	
 	// CREAZIONE DELLA SOCKET
-	int Csocket;
-	Csocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (Csocket < 0) {
+	int clientSocket;
+	clientSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (clientSocket < 0) {
 		ErrorHandler("socket creation failed.\n");
-		closesocket(Csocket);
+		closesocket(clientSocket);
 		ClearWinSock();
 		return -1;
 	}
@@ -68,10 +68,10 @@ int main(void) {
 	sad.sin_port = htons(port); // Server port
 
 	// CONNESSIONE AL SERVER
-	if (connect(Csocket, (struct sockaddr *)&sad, sizeof(sad)) < 0)
+	if (connect(clientSocket, (struct sockaddr *)&sad, sizeof(sad)) < 0)
 	{
 		ErrorHandler( "Failed to connect.\n" );
-		closesocket(Csocket);
+		closesocket(clientSocket);
 		ClearWinSock();
 		return -1;
 	}
@@ -79,67 +79,62 @@ int main(void) {
 	// GESTIONE DELLA CONNESSIONE COL SERVER
 
 	// Ricevo stringa "connnessione avvenuta"
-	char buf[BUFFER_SIZE]; // buffer for data from the server
+	char buffer[BUFFER_SIZE]; // buffer for data from the server
 	int bytesRicev = 0;
-	if ((bytesRicev = recv(Csocket, buf, BUFFER_SIZE - 1, 0)) <= 0) {
+	if ((bytesRicev = recv(clientSocket, buffer, BUFFER_SIZE, 0)) <= 0) {
 		ErrorHandler("recv() failed or connection closed prematurely");
-		closesocket(Csocket);
+		closesocket(clientSocket);
 		ClearWinSock();
 		return -1;
 	}
-	buf[bytesRicev] = '\0'; // Add \0 so printf knows where to stop
-	printf("%s", buf); // Print the echo buffer
+	printf("%s\n", buffer); // Print the echo buffer
 
 	//Ciclo do-while fin quando non riceviamo la stringa bye
 	do {
-		char* aString = ""; // Stringa A da inviare
-		char* bString = ""; // Stringa B da inviare
+		char aString[BUFFER_SIZE] = ""; // Stringa A da inviare
+		char bString[BUFFER_SIZE] = ""; // Stringa B da inviare
 
 		printf("Insert first string:");
-		scanf("%s", aString);
+		scanf("%s", &aString);
 		printf("Insert second string:");
-		scanf("%s", bString);
-
-		int aStringLen = strlen(aString); // Determina la lunghezza della stringa A
-		int bStringLen = strlen(bString); // Determina la lunghezza della stringa B
+		scanf("%s", &bString);
 
 		// INVIO STRINGHE AL SERVER
 		// Invio stringa A
-		if (send(Csocket, aString, aStringLen, 0) != aStringLen) {
+		strcpy(buffer, aString);
+		if (send(clientSocket, buffer, BUFFER_SIZE, 0) <= 0) {
 			ErrorHandler("send() sent a different number of bytes than expected");
-			closesocket(Csocket);
+			closesocket(clientSocket);
 			ClearWinSock();
 			return -1;
 		}
 
 		// Invio stringa B
-		if (send(Csocket, bString, bStringLen, 0) != bStringLen) {
+		strcpy(buffer, bString);
+		if (send(clientSocket, buffer, BUFFER_SIZE, 0) <= 0) {
 			ErrorHandler("send() sent a different number of bytes than expected");
-			closesocket(Csocket);
+			closesocket(clientSocket);
 			ClearWinSock();
 			return -1;
 		}
 
 		// RICEVO STRINGA DAL SERVER
 
-
-
-
 		int bytesRcvd;
 		printf("Received: "); // Setup to print the echoed string
 
-		if ((bytesRcvd = recv(Csocket, buf, BUFFER_SIZE - 1, 0)) <= 0) {
+		if ((bytesRcvd = recv(clientSocket, buffer, BUFFER_SIZE, 0)) <= 0) {
 			ErrorHandler("recv() failed or connection closed prematurely");
-			closesocket(Csocket);
+			closesocket(clientSocket);
 			ClearWinSock();
 			return -1;
 		}
-		buf[bytesRcvd] = '\0'; // Add \0 so printf knows where to stop
-		printf("%s", buf); // Print the echo buffer
-	}while(!strcmp(buf,"bye"));
+		printf("%s\n", buffer); // Print the echo buffer
+		printf("---------------\n");
+	}while(strcmp(buffer,"bye") != 0);
 
 	// CHIUSURA DELLA CONNESSIONE
-	closesocket(Csocket);
+	closesocket(clientSocket);
 	ClearWinSock();
 	printf("\n"); // Print a final linefeed
 	system("pause");
