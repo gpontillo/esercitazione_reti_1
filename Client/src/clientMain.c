@@ -80,24 +80,41 @@ int main(void) {
 		ClearWinSock();
 		return -1;
 	}
-	char* inputString = "prova"; // Stringa da inviare
-	int stringLen = strlen(inputString); // Determina la lunghezza
-
-	// INVIARE DATI AL SERVER
-	if (send(Csocket, inputString, stringLen, 0) != stringLen) {
-		ErrorHandler("send() sent a different number of bytes than expected");
-		closesocket(Csocket);
-		ClearWinSock();
-		return -1;
-	}
-
-	// RICEVERE DATI DAL SERVER
-	int bytesRcvd;
-	int totalBytesRcvd = 0;
 	char buf[BUFFERSIZE]; // buffer for data from the server
-	printf("Received: "); // Setup to print the echoed string
+	do {
+		char* aString = ""; // Stringa A da inviare
+		char* bString = ""; // Stringa B da inviare
 
-	while (totalBytesRcvd < stringLen) {
+		printf("Insert first string:");
+		scanf("%s", &aString);
+		printf("Insert second string:");
+		scanf("%s", &bString);
+
+		int aStringLen = strlen(aString); // Determina la lunghezza della stringa A
+		int bStringLen = strlen(bString); // Determina la lunghezza della stringa B
+
+		// INVIARE DATI AL SERVER
+		// Invio stringa A
+		if (send(Csocket, aString, aStringLen, 0) != aStringLen) {
+			ErrorHandler("send() sent a different number of bytes than expected");
+			closesocket(Csocket);
+			ClearWinSock();
+			return -1;
+		}
+
+		// Invio stringa B
+		if (send(Csocket, bString, bStringLen, 0) != bStringLen) {
+			ErrorHandler("send() sent a different number of bytes than expected");
+			closesocket(Csocket);
+			ClearWinSock();
+			return -1;
+		}
+
+		// RICEVERE DATI DAL SERVER
+		int bytesRcvd;
+		int totalBytesRcvd = 0;
+		printf("Received: "); // Setup to print the echoed string
+
 		if ((bytesRcvd = recv(Csocket, buf, BUFFERSIZE - 1, 0)) <= 0) {
 			ErrorHandler("recv() failed or connection closed prematurely");
 			closesocket(Csocket);
@@ -107,7 +124,7 @@ int main(void) {
 		totalBytesRcvd += bytesRcvd; // Keep tally of total bytes
 		buf[bytesRcvd] = '\0'; // Add \0 so printf knows where to stop
 		printf("%s", buf); // Print the echo buffer
-	}
+	}while(buf != "bye");
 
 	// CHIUSURA DELLA CONNESSIONE
 	closesocket(Csocket);
