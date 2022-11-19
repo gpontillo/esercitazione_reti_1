@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #define SIZE 10
 #define BUFFERSIZE 512
 #define PROTOPORT 27015 // Numero di porta di default
@@ -120,7 +121,7 @@ int main(void) {
 		totalBytesRcvd += bytesRcvd; // Keep tally of total bytes
 		buf[bytesRcvd] = '\0'; // Add \0 so printf knows where to stop
 		printf("%s", buf); // Print the echo buffer
-	}while(buf != "bye");
+	}while(strcmp(buf,"bye"));
 
 	// CHIUSURA DELLA CONNESSIONE
 	closesocket(Csocket);
