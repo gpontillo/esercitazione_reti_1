@@ -20,14 +20,14 @@ Di seguito è riportata la traccia di riferimento che possiamo ritrovare anche a
 
 Per buildare e successivamente eseguire il server è necessario:
 1. Aprire Eclipse
-2. Andare su *File* -> *Open Projects from File System...*
-3. Selezionare la cartella *Server* all'interno della repository e fare *Seleziona cartella*
-4. Cliccare su *Finish*
+2. Andare su **File** -> **Open Projects from File System...**
+3. Selezionare la cartella `Server` all'interno della repository e fare **Seleziona cartella**
+4. Cliccare su **Finish**
 
 Successivamente per buildare il server è necessario:
-1. Aprire la cartella *src*
-2. Aprire il file *serverMain.c*
-3. Cliccare su *Build*
+1. Aprire la cartella `src`
+2. Aprire il file `serverMain.c`
+3. Cliccare su **Build**
 
 Il file eseguibile generato si troverà in *Binaries* e si chiamerà *Server.exe*
 
@@ -37,15 +37,15 @@ Il file eseguibile generato si troverà in *Binaries* e si chiamerà *Server.exe
 
 Per buildare e successivamente eseguire il client è necessario:
 1. Aprire Eclipse
-2. Andare su `File` -> `Open Projects from File System...`
-3. Selezionare la cartella **Client** all'interno della repository e fare `Seleziona cartella`
-4. Cliccare su `Finish`
+2. Andare su **File** -> **Open Projects from File System...**
+3. Selezionare la cartella `Client` all'interno della repository e fare **Seleziona cartella**
+4. Cliccare su **Finish**
 
 Successivamente per buildare il client è necessario:
-1. Aprire la cartella **src**
-2. Aprire il file **clientMain.c**
-3. Cliccare su `Build`
+1. Aprire la cartella `src`
+2. Aprire il file `clientMain.c`
+3. Cliccare su **Build**
 
-Il file eseguibile generato si troverà in **Binaries** e si chiamerà **Client.exe**
+Il file eseguibile generato si troverà in **Binaries** e si chiamerà `Client.exe`
 
 > Nota: il client richiede all'inizio la porta del server. Se non si è modificata nel codice, la porta per potersi connettere al server è di default **5555**
