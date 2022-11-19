@@ -77,7 +77,20 @@ int main(void) {
 	}
 
 	// GESTIONE DELLA CONNESSIONE COL SERVER
+
+	// Ricevo stringa "connnessione avvenuta"
 	char buf[BUFFERSIZE]; // buffer for data from the server
+	int bytesRicev = 0;
+	if ((bytesRicev = recv(Csocket, buf, BUFFERSIZE - 1, 0)) <= 0) {
+		ErrorHandler("recv() failed or connection closed prematurely");
+		closesocket(Csocket);
+		ClearWinSock();
+		return -1;
+	}
+	buf[bytesRicev] = '\0'; // Add \0 so printf knows where to stop
+	printf("%s", buf); // Print the echo buffer
+
+	//Ciclo do-while fin quando non riceviamo la stringa bye
 	do {
 		char* aString = ""; // Stringa A da inviare
 		char* bString = ""; // Stringa B da inviare
@@ -109,7 +122,6 @@ int main(void) {
 
 		// RICEVO STRINGA DAL SERVER
 		int bytesRcvd;
-		int totalBytesRcvd = 0;
 		printf("Received: "); // Setup to print the echoed string
 
 		if ((bytesRcvd = recv(Csocket, buf, BUFFERSIZE - 1, 0)) <= 0) {
@@ -118,7 +130,6 @@ int main(void) {
 			ClearWinSock();
 			return -1;
 		}
-		totalBytesRcvd += bytesRcvd; // Keep tally of total bytes
 		buf[bytesRcvd] = '\0'; // Add \0 so printf knows where to stop
 		printf("%s", buf); // Print the echo buffer
 	}while(!strcmp(buf,"bye"));
