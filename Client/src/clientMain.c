@@ -121,7 +121,7 @@ int main(void) {
 		totalBytesRcvd += bytesRcvd; // Keep tally of total bytes
 		buf[bytesRcvd] = '\0'; // Add \0 so printf knows where to stop
 		printf("%s", buf); // Print the echo buffer
-	}while(strcmp(buf,"bye"));
+	}while(!strcmp(buf,"bye"));
 
 	// CHIUSURA DELLA CONNESSIONE
 	closesocket(Csocket);
