@@ -83,9 +83,9 @@ int main(void) {
 		char* bString = ""; // Stringa B da inviare
 
 		printf("Insert first string:");
-		scanf("%s", &aString);
+		scanf("%s", aString);
 		printf("Insert second string:");
-		scanf("%s", &bString);
+		scanf("%s", bString);
 
 		int aStringLen = strlen(aString); // Determina la lunghezza della stringa A
 		int bStringLen = strlen(bString); // Determina la lunghezza della stringa B
