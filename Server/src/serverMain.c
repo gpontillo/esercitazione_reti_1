@@ -165,11 +165,11 @@ int main()
 			strcpy(stringB, buffer);
 			printf("String B: %s\n", stringB);
 
-			if (strcmp(stringA, "stop") == 0 || strcmp(stringB, "stop") == 0)
+			if (strcmp(stringA, "quit") == 0 || strcmp(stringB, "quit") == 0)
 			{
 				strcpy(buffer, "bye");
 				fine = 1;
-				printf("Found string with 'stop'. Sending 'bye to client'\n");
+				printf("Found string with 'quit'. Sending 'bye to client'\n");
 			}
 			else
 			{
