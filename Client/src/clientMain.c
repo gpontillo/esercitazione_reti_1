@@ -76,7 +76,7 @@ int main(void) {
 		return -1;
 	}
 
-
+	// GESTIONE DELLA CONNESSIONE COL SERVER
 	char buf[BUFFERSIZE]; // buffer for data from the server
 	do {
 		char* aString = ""; // Stringa A da inviare
@@ -90,7 +90,7 @@ int main(void) {
 		int aStringLen = strlen(aString); // Determina la lunghezza della stringa A
 		int bStringLen = strlen(bString); // Determina la lunghezza della stringa B
 
-		// INVIARE DATI AL SERVER
+		// INVIO STRINGHE AL SERVER
 		// Invio stringa A
 		if (send(Csocket, aString, aStringLen, 0) != aStringLen) {
 			ErrorHandler("send() sent a different number of bytes than expected");
@@ -107,7 +107,7 @@ int main(void) {
 			return -1;
 		}
 
-		// RICEVERE DATI DAL SERVER
+		// RICEVO STRINGA DAL SERVER
 		int bytesRcvd;
 		int totalBytesRcvd = 0;
 		printf("Received: "); // Setup to print the echoed string
