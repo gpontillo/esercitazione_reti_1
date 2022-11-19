@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#define SIZE 10
 #define BUFFERSIZE 512
 #define PROTOPORT 27015 // Numero di porta di default
 
@@ -34,6 +35,17 @@ void ClearWinSock() {
 
 int main(void) {
 	
+	char ipAddress[SIZE];
+
+	printf("Inserisci l'IP del Server");
+
+	gets(ipAddress);
+
+	fflush(stdin);
+
+
+
+
 	#if defined WIN32
 	WSADATA wsaData;
 	int iResult = WSAStartup(MAKEWORD(2 ,2), &wsaData);

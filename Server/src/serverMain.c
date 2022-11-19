@@ -19,9 +19,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #define PROTOPORT 27015 // default protocol port number
 #define QLEN 6 // size of request queue
+#define BUFFERSIZE 1024
 
 void errorHandler(char *errorMessage) {
 	printf ("%s", errorMessage);
@@ -69,6 +71,7 @@ int main(int argc, char *argv[]) {
 		return -1;
 	}
 
+
 	// ASSEGNAZIONE DI UN INDIRIZZO ALLA SOCKET
 	struct sockaddr_in sad;
 	memset(&sad, 0, sizeof(sad)); // ensures that extra bytes contain 0
@@ -109,7 +112,15 @@ int main(int argc, char *argv[]) {
 		}
 		printf("Handling client %s\n", inet_ntoa(cad.sin_addr));
 
-		//roba da fare
+	//RICEZIONE DELLA STRINGA
+
+	char stringa[BUFFERSIZE] = " ";
+
+	int ricevi;
+
+	ricevi = recv(MySocket, stringa, BUFFERSIZE, 0);
+
+
 	}
 	return 0;
 }
