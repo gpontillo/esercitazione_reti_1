@@ -41,7 +41,7 @@ void closeConnection(int mySocket) {
 	clearWinSock();
 }
 
-int main(int argc, char *argv[]) {
+int main() {
 
 
 
@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
 	}
 
 
-	// ASSEGNAZIONE DI UN INDIRIZZO ALLA SOCKET
+	// ASSEGNAZIONE INDIRIZZO PER LA SOCKET
 	struct sockaddr_in socketAddress;
 
 	memset(&socketAddress, 0, sizeof(socketAddress)); // ensures that extra bytes contain 0
@@ -81,15 +81,16 @@ int main(int argc, char *argv[]) {
 	 */
 	if (bind(serverSocket, (struct sockaddr*) &socketAddress, sizeof(socketAddress)) < 0) {
 		errorHandler("bind() failed.\n");
-		closesocket(socketAddress);
+		closesocket(serverSocket);
 		clearWinSock();
 		return -1;
 	}
 
 	// SETTAGGIO DELLA SOCKET ALL'ASCOLTO
-	if (listen (socketAddress, CLIENT_NUMBERS) < 0) {
+
+	if (listen (serverSocket, CLIENT_NUMBERS) < 0) {
 		errorHandler("listen() failed.\n");
-		closesocket(socketAddress);
+		closesocket(serverSocket);
 		clearWinSock();
 		return -1;
 	}
@@ -122,9 +123,9 @@ int main(int argc, char *argv[]) {
 
 	char stringaInvio[20] = "Connessione avvenuta";
 
-	int invio;
+	//int invio;
 
-	invio = send(serverSocket, stringaInvio, BUFFERSIZE, 0);
+	send(serverSocket, stringaInvio, BUFFERSIZE, 0);
 
 	/*char stringa[BUFFERSIZE] = " ";
 
