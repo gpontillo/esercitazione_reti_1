@@ -21,8 +21,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define PORT 27015 // default protocol port number
-#define CLIENT_NUMBERS 6 // size of request queue
+#define PORT 5555 // default port
+#define CLIENT_NUMBERS 6 // numbers of acceptable clients
 #define BUFFERSIZE 1024
 
 void errorHandler(char *errorMessage) {

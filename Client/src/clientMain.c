@@ -21,8 +21,8 @@
 #include <stdlib.h>
 #include <string.h>
 #define SIZE 10
-#define BUFFERSIZE 512
-#define PROTOPORT 27015 // Numero di porta di default
+#define BUFFER_SIZE 512
+#define DEFAULT_PORT 5555 // Numero di porta di default
 
 void ErrorHandler(char *errorMessage) {
 	printf("%s",errorMessage);
@@ -57,7 +57,7 @@ int main(void) {
 	}
 
 	// COSTRUZIONE DELL’INDIRIZZO DEL SERVER
-	int port = PROTOPORT;
+	int port = DEFAULT_PORT;
 	printf("Insert the port number of the server: ");
 	scanf("%d", &port);
 
@@ -79,9 +79,9 @@ int main(void) {
 	// GESTIONE DELLA CONNESSIONE COL SERVER
 
 	// Ricevo stringa "connnessione avvenuta"
-	char buf[BUFFERSIZE]; // buffer for data from the server
+	char buf[BUFFER_SIZE]; // buffer for data from the server
 	int bytesRicev = 0;
-	if ((bytesRicev = recv(Csocket, buf, BUFFERSIZE - 1, 0)) <= 0) {
+	if ((bytesRicev = recv(Csocket, buf, BUFFER_SIZE - 1, 0)) <= 0) {
 		ErrorHandler("recv() failed or connection closed prematurely");
 		closesocket(Csocket);
 		ClearWinSock();
@@ -124,7 +124,7 @@ int main(void) {
 		int bytesRcvd;
 		printf("Received: "); // Setup to print the echoed string
 
-		if ((bytesRcvd = recv(Csocket, buf, BUFFERSIZE - 1, 0)) <= 0) {
+		if ((bytesRcvd = recv(Csocket, buf, BUFFER_SIZE - 1, 0)) <= 0) {
 			ErrorHandler("recv() failed or connection closed prematurely");
 			closesocket(Csocket);
 			ClearWinSock();
