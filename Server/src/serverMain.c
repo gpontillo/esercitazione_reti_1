@@ -105,8 +105,7 @@ int main()
 	int clientSocket;				  // socket descriptor for the client
 	int clientLen;					  // the size of the client address
 
-
-	while (true)
+	while (1)
 	{
 		printf("Waiting for a client to connect...");
 
@@ -139,10 +138,10 @@ int main()
 
 		int fine = 0;
 
-		//Ciclo do-while fin quando non riceviamo una stringa stop
+		// Ciclo do-while fin quando non riceviamo una stringa stop
 		do
 		{
-			//Lettura della stringa A
+			// Lettura della stringa A
 			char stringA[BUFFER_SIZE] = "";
 			char stringB[BUFFER_SIZE] = "";
 			int bytesRcvd;
@@ -156,7 +155,7 @@ int main()
 			strcpy(stringA, buffer);
 			printf("String A: %s\n", stringA);
 
-			//Lettura della stringa B
+			// Lettura della stringa B
 			if ((bytesRcvd = recv(clientSocket, buffer, BUFFER_SIZE, 0)) <= 0)
 			{
 				errorHandler("recv() failed or connection closed prematurely");
@@ -166,17 +165,19 @@ int main()
 			strcpy(stringB, buffer);
 			printf("String B: %s\n", stringB);
 
-			if(strcmp(stringA, "stop") == 0 || strcmp(stringB, "stop") == 0) {
+			if (strcmp(stringA, "stop") == 0 || strcmp(stringB, "stop") == 0)
+			{
 				strcpy(buffer, "bye");
 				fine = 1;
 				printf("Found string with 'stop'. Sending 'bye to client'\n");
 			}
-			else {
+			else
+			{
 				char stringConcat[BUFFER_SIZE] = "";
 				strcpy(stringConcat, stringA);
 				strcat(stringConcat, stringB);
 				strcpy(buffer, stringConcat);
-				printf("A+B: %s\n",stringConcat);
+				printf("A+B: %s\n", stringConcat);
 			}
 			if (send(clientSocket, buffer, BUFFER_SIZE, 0) <= 0)
 			{
