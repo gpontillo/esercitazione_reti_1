@@ -69,13 +69,20 @@ int main(void) {
 		return -1;
 	}
 	char buf[BUFFERSIZE]; // buffer for data from the server
-	while(buf != "bye") {
+	do {
 		char* aString = ""; // Stringa A da inviare
 		char* bString = ""; // Stringa B da inviare
+
+		printf("Insert first string:");
+		scanf("%s", &aString);
+		printf("Insert second string:");
+		scanf("%s", &bString);
+
 		int aStringLen = strlen(aString); // Determina la lunghezza della stringa A
-		int bStringLen = strlen(bString); // Determina la lunghezza della stringa A
+		int bStringLen = strlen(bString); // Determina la lunghezza della stringa B
 
 		// INVIARE DATI AL SERVER
+		// Invio stringa A
 		if (send(Csocket, aString, aStringLen, 0) != aStringLen) {
 			ErrorHandler("send() sent a different number of bytes than expected");
 			closesocket(Csocket);
@@ -83,6 +90,7 @@ int main(void) {
 			return -1;
 		}
 
+		// Invio stringa B
 		if (send(Csocket, bString, bStringLen, 0) != bStringLen) {
 			ErrorHandler("send() sent a different number of bytes than expected");
 			closesocket(Csocket);
@@ -104,7 +112,7 @@ int main(void) {
 		totalBytesRcvd += bytesRcvd; // Keep tally of total bytes
 		buf[bytesRcvd] = '\0'; // Add \0 so printf knows where to stop
 		printf("%s", buf); // Print the echo buffer
-	}
+	}while(buf != "bye");
 
 	// CHIUSURA DELLA CONNESSIONE
 	closesocket(Csocket);
