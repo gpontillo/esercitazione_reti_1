@@ -169,15 +169,19 @@ int main()
 				return -1;
 			}
 
+
 			strcpy(stringB, buffer);
 			printf("Stringa B: %s\n", stringB);
 
 			//Se una delle due stringhe è uguale a 'quit'
+
 			if (strcmp(stringA, "quit") == 0 || strcmp(stringB, "quit") == 0)
 			{
 				strcpy(buffer, "bye");
 				fine = 1;
+
 				printf("Stringa con 'quit' individuata. Invio di 'bye' al client.\n");
+
 			}
 			else
 			{
