@@ -21,25 +21,29 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define PORT 5555		 // default port
-#define CLIENT_NUMBERS 6 // numbers of acceptable clients
-#define BUFFER_SIZE 1024
+#define PORT 5555		 // numero di porta di default
+#define MAX_CONNECTIONS 6 // numero massimo di connessioni accettate dal Server
+#define BUFFER_SIZE 1024 // dimensione del buffer
 
-void errorHandler(char *errorMessage)
+
+// FUNZIONE PER GESTIONE ERRORI
+void errorHandler(char *messaggioDiErrore)
 {
-	printf("%s", errorMessage);
+	printf("%s", messaggioDiErrore);
+	system("pause");
 }
 
+// FUNZIONE PER TERMINARE L'USO DI WINSOCK
 void clearWinSock()
 {
-#if defined WIN32
+	#if defined WIN32
 	WSACleanup();
-#endif
+	#endif
 }
 
+//FUNZIONE PER CHIUSURA DELLA CONNESSIONE
 void closeConnection(int mySocket)
 {
-	// CHIUSURA DELLA CONNESSIONE
 	closesocket(mySocket);
 	clearWinSock();
 }
@@ -47,24 +51,27 @@ void closeConnection(int mySocket)
 int main()
 {
 
-#if defined WIN32 // initialize Winsock
+	#if defined WIN32
+
+	//INIZIALIZZAZIONE DELLA WINSOCK
 	WSADATA wsaData;
-	int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	if (iResult != 0)
+	int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+
+	if (result != 0)
 	{
-		errorHandler("Error at WSAStartup()\n");
+		errorHandler("Errore! Funzione WSAStartup() fallita.\n");
 		return 0;
 	}
-#endif
+
+	#endif
 
 	// CREAZIONE DELLA SOCKET
 	int serverSocket;
-
 	serverSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	if (serverSocket < 0)
 	{
-		errorHandler("socket creation failed.\n");
+		errorHandler("Errore! Creazione della socket fallita.\n");
 		clearWinSock();
 		return -1;
 	}
@@ -72,116 +79,119 @@ int main()
 	// ASSEGNAZIONE INDIRIZZO PER LA SOCKET
 	struct sockaddr_in socketAddress;
 
-	memset(&socketAddress, 0, sizeof(socketAddress)); // ensures that extra bytes contain 0
+	memset(&socketAddress, 0, sizeof(socketAddress));
 
-	socketAddress.sin_family = AF_INET;
-	socketAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
-	socketAddress.sin_port = htons(PORT);
-	/*
-	 * converts values between the host and
-	 * network byte order. Specifically, htons() converts 16-bit quantities
-	 * from host byte order to network byte order.
-	 */
+	socketAddress.sin_family = AF_INET; //famiglia protocolli
+	socketAddress.sin_addr.s_addr = inet_addr("127.0.0.1"); //indirizzo IP Server
+	socketAddress.sin_port = htons(PORT); //numero di porta del Server
+
+	// ASSOCIAMENTO DI UN INDIRIZZO ALLA SOCKET
 	if (bind(serverSocket, (struct sockaddr *)&socketAddress, sizeof(socketAddress)) < 0)
 	{
-		errorHandler("bind() failed.\n");
+		errorHandler("Errore! Funzione bind() fallita.\n");
 		closesocket(serverSocket);
 		clearWinSock();
 		return -1;
 	}
 
-	// SETTAGGIO DELLA SOCKET ALL'ASCOLTO
-
-	if (listen(serverSocket, CLIENT_NUMBERS) < 0)
+	// ASCOLTO DI EVENTUALI CONNESSIONI
+	if (listen(serverSocket, MAX_CONNECTIONS) < 0)
 	{
-		errorHandler("listen() failed.\n");
+		errorHandler("Errore! Funzione listen() fallita.\n");
 		closesocket(serverSocket);
 		clearWinSock();
 		return -1;
 	}
 
-	// ACCETTARE UNA NUOVA CONNESSIONE
-	struct sockaddr_in clientAddress; // structure for the client address
-	int clientSocket;				  // socket descriptor for the client
-	int clientLen;					  // the size of the client address
+	struct sockaddr_in clientAddress; // struttura per l'indirizzo del Client
+	int clientSocket;				  // descrittore per la socket Client
+	int clientLen;					  // dimensione dell'indirizzo del Client
 
-	while (1)
+	while(true)
 	{
-		printf("Waiting for a client to connect...");
+		printf("In attesa di connessione da parte di un client...\n");
 
-		clientLen = sizeof(clientAddress); // set the size of the client address
 
+		clientLen = sizeof(clientAddress); // dimensione dell'indirizzo del Client
+
+		//ACCETTAZIONE DI NUOVE CONNESSIONI
 		clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddress, &clientLen);
 
 		if (clientSocket < 0)
 		{
-			errorHandler("accept() failed.\n");
+			errorHandler("Errore! Funzione accept() fallita.\n");
 			closeConnection(serverSocket);
 			return 0;
 		}
 
-		printf("\n\nConnection established\n\n");
 		// VISUALIZZAZIONE IP DEL CLIENT
-		printf("Handling client with IP: %s\n\n", inet_ntoa(clientAddress.sin_addr));
+		printf("Connessione avvenuta con il client: %s\n\n", inet_ntoa(clientAddress.sin_addr));
 
 		// GESTIONE DELLA CONNESSIONE COL SERVER
 
-		// Invio della stringa di connessione
 		char buffer[BUFFER_SIZE];
-		strcpy(buffer, "Connessione avvenuta");
+
+		// Invio della stringa di connessione
+		strcpy(buffer, "Connessione avvenuta\n");
 		if (send(clientSocket, buffer, BUFFER_SIZE, 0) <= 0)
 		{
-			errorHandler("send() sent a different number of bytes than expected\n");
+			errorHandler("Errore! funzione send() fallita.\n");
 			closeConnection(serverSocket);
 			return -1;
 		}
 
 		int fine = 0;
 
-		// Ciclo do-while fin quando non riceviamo una stringa stop
+		// Ciclo do-while fin quando non riceviamo una stringa 'quit'
 		do
 		{
-			// Lettura della stringa A
+
 			char stringA[BUFFER_SIZE] = "";
 			char stringB[BUFFER_SIZE] = "";
 			int bytesRcvd;
 
+			// Ricezione della stringa A
 			if ((bytesRcvd = recv(clientSocket, buffer, BUFFER_SIZE, 0)) <= 0)
 			{
-				errorHandler("recv() failed or connection closed prematurely");
+				errorHandler("Errore! Funzione recv() fallita.\n");
 				closesocket(clientSocket);
 				return -1;
 			}
-			strcpy(stringA, buffer);
-			printf("String A: %s\n", stringA);
 
-			// Lettura della stringa B
+			strcpy(stringA, buffer);
+			printf("Stringa A: %s\n", stringA);
+
+			// Ricezione della stringa B
 			if ((bytesRcvd = recv(clientSocket, buffer, BUFFER_SIZE, 0)) <= 0)
 			{
-				errorHandler("recv() failed or connection closed prematurely");
+				errorHandler("Errore! Funzione recv() fallita.\n");
 				closeConnection(serverSocket);
 				return -1;
 			}
-			strcpy(stringB, buffer);
-			printf("String B: %s\n", stringB);
 
-			if (strcmp(stringA, "stop") == 0 || strcmp(stringB, "stop") == 0)
+			strcpy(stringB, buffer);
+			printf("Stringa B: %s\n", stringB);
+
+			//Se una delle due stringhe è uguale a 'quit'
+			if (strcmp(stringA, "quit") == 0 || strcmp(stringB, "quit") == 0)
 			{
 				strcpy(buffer, "bye");
 				fine = 1;
-				printf("Found string with 'stop'. Sending 'bye to client'\n");
+				printf("Stringa con 'quit' individuata. Invio di 'bye' al client.\n");
 			}
 			else
 			{
+				//concatena le due stringhe
 				char stringConcat[BUFFER_SIZE] = "";
 				strcpy(stringConcat, stringA);
 				strcat(stringConcat, stringB);
 				strcpy(buffer, stringConcat);
 				printf("A+B: %s\n", stringConcat);
 			}
+
 			if (send(clientSocket, buffer, BUFFER_SIZE, 0) <= 0)
 			{
-				errorHandler("send() sent a different number of bytes than expected\n");
+				errorHandler("Errore! Funzione send() fallita.\n");
 				closeConnection(serverSocket);
 				return -1;
 			}
@@ -189,13 +199,6 @@ int main()
 
 		} while (!fine);
 
-		/*char stringa[BUFFER_SIZE] = " ";
-
-		int ricevi;
-
-		ricevi = recv(serverSocket, stringa, BUFFER_SIZE, 0);
-
-		printf("%s", stringa);*/
 	}
 	return 0;
 }

@@ -20,123 +20,140 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define SIZE 10
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 1024  // Dimensione del buffer
 #define DEFAULT_PORT 5555 // Numero di porta di default
 
-void ErrorHandler(char *errorMessage) {
-	printf("%s",errorMessage);
+
+// FUNZIONE PER GESTIONE ERRORI
+void errorHandler(char *messaggioDiErrore)
+{
+	printf("%s", messaggioDiErrore);
+	system("pause");
 }
 
-void ClearWinSock() {
+// FUNZIONE PER TERMINARE L'USO DI WINSOCK
+void clearWinSock() {
 	#if defined WIN32
 	WSACleanup();
 	#endif
+}
+
+// FUNZIONE PER CHIUSURA CONNESSIONE
+void closeConnection(int mySocket)
+{
+	closesocket(mySocket);
+	clearWinSock();
 }
 
 int main(void) {
 
 	#if defined WIN32
 
+	//INIZIALIZZAZIONE DELLA WINSOCK
 	WSADATA wsaData;
-	int iResult = WSAStartup(MAKEWORD(2 ,2), &wsaData);
-	if (iResult != 0) {
-		printf ("error at WSASturtup\n");
+	int result = WSAStartup(MAKEWORD(2,2), &wsaData);
+
+	if (result != 0) {
+		errorHandler("Errore! Funzione WSAStartup() fallita\n");
 		return -1;
 	}
+
 	#endif
 	
 	// CREAZIONE DELLA SOCKET
 	int clientSocket;
 	clientSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+
 	if (clientSocket < 0) {
-		ErrorHandler("socket creation failed.\n");
-		closesocket(clientSocket);
-		ClearWinSock();
+		errorHandler("Errore! Creazione della socket fallita.\n");
+		closeConnection(clientSocket);
 		return -1;
 	}
 
-	// COSTRUZIONE DELL’INDIRIZZO DEL SERVER
-	int port = DEFAULT_PORT;
-	printf("Insert the port number of the server: ");
+	// Inserimento da tastiera del numero di porta del server
+	int port;
+	printf("Inserisci il numero di porta del server (%d):", DEFAULT_PORT);
 	scanf("%d", &port);
 
-	struct sockaddr_in sad;
-	memset(&sad, 0, sizeof(sad));
-	sad.sin_family = AF_INET;
-	sad.sin_addr.s_addr = inet_addr("127.0.0.1"); // IP del server
-	sad.sin_port = htons(port); // Server port
+	// COSTRUZIONE DELL’INDIRIZZO DEL SERVER
+	struct sockaddr_in socketAddress;
+	memset(&socketAddress, 0, sizeof(socketAddress));
+
+	socketAddress.sin_family = AF_INET; //famiglia del protocollo
+	socketAddress.sin_addr.s_addr = inet_addr("127.0.0.1"); // IP del server
+	socketAddress.sin_port = htons(port); // Numero di porta del server
 
 	// CONNESSIONE AL SERVER
-	if (connect(clientSocket, (struct sockaddr *)&sad, sizeof(sad)) < 0)
+	if (connect(clientSocket, (struct sockaddr *)&socketAddress, sizeof(socketAddress)) < 0)
 	{
-		ErrorHandler( "Failed to connect.\n" );
-		closesocket(clientSocket);
-		ClearWinSock();
+		errorHandler("Errore! Connessione fallita.\n");
+		closeConnection(clientSocket);
 		return -1;
 	}
 
 	// GESTIONE DELLA CONNESSIONE COL SERVER
-
-	// Ricevo stringa "connnessione avvenuta"
-	char buffer[BUFFER_SIZE]; // buffer for data from the server
+	// Ricezione della stringa "connnessione avvenuta"
+	char buffer[BUFFER_SIZE]; // buffer per i dati dal server
 	int bytesRicev = 0;
+
 	if ((bytesRicev = recv(clientSocket, buffer, BUFFER_SIZE, 0)) <= 0) {
-		ErrorHandler("recv() failed or connection closed prematurely");
-		closesocket(clientSocket);
-		ClearWinSock();
+		errorHandler("Errore! Funzione recv() fallita.\n");
+		closeConnection(clientSocket);
 		return -1;
 	}
-	printf("%s\n", buffer); // Print the echo buffer
+	printf("%s\n", buffer);
 
 	//Ciclo do-while fin quando non riceviamo la stringa bye
 	do {
 		char aString[BUFFER_SIZE] = ""; // Stringa A da inviare
 		char bString[BUFFER_SIZE] = ""; // Stringa B da inviare
 
-		printf("Insert first string:");
-		scanf("%s", &aString);
-		printf("Insert second string:");
-		scanf("%s", &bString);
+
+		// Inserimento stringhe A e B da tastiera
+		printf("Inserisci stringa A:");
+		scanf("%s", aString);
+
+		printf("Inserisci stringa B:");
+		scanf("%s", bString);
 
 		// INVIO STRINGHE AL SERVER
 		// Invio stringa A
 		strcpy(buffer, aString);
 		if (send(clientSocket, buffer, BUFFER_SIZE, 0) <= 0) {
-			ErrorHandler("send() sent a different number of bytes than expected");
-			closesocket(clientSocket);
-			ClearWinSock();
+
+			errorHandler("Errore! Funzione send() fallita.\n");
+			closeConnection(clientSocket);
 			return -1;
 		}
 
 		// Invio stringa B
 		strcpy(buffer, bString);
 		if (send(clientSocket, buffer, BUFFER_SIZE, 0) <= 0) {
-			ErrorHandler("send() sent a different number of bytes than expected");
-			closesocket(clientSocket);
-			ClearWinSock();
+
+			errorHandler("Errore! Funzione send() fallita.\n");
+			closeConnection(clientSocket);
 			return -1;
 		}
 
-		// RICEVO STRINGA DAL SERVER
-
+		// RICEZIONE STRINGA DAL SERVER
 		int bytesRcvd;
-		printf("Received: "); // Setup to print the echoed string
+		printf("Ricevuto: ");
 
 		if ((bytesRcvd = recv(clientSocket, buffer, BUFFER_SIZE, 0)) <= 0) {
-			ErrorHandler("recv() failed or connection closed prematurely");
-			closesocket(clientSocket);
-			ClearWinSock();
+
+			errorHandler("Errore! Funzione recv() fallita.\n");
+			closeConnection(clientSocket);
 			return -1;
 		}
-		printf("%s\n", buffer); // Print the echo buffer
+
+		printf("%s\n", buffer);
 		printf("---------------\n");
+
 	}while(strcmp(buffer,"bye") != 0);
 
 	// CHIUSURA DELLA CONNESSIONE
-	closesocket(clientSocket);
-	ClearWinSock();
-	printf("\n"); // Print a final linefeed
+	closeConnection(clientSocket);
+	printf("\n");
 	system("pause");
-	return(0);
+	return 0;
 }
